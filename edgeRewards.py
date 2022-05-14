@@ -8,8 +8,20 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 from random_word import RandomWords
 from overViewWindow import create_overview_window
+import json
+import os.path
 
-dir = r'C:\Users\Admin\AppData\Local\MicrosoftEdge\User\Default'
+settings = {}
+
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    with open(f'{parent_dir}\\rewardSettings.json', 'r') as file:
+        settings = json.load(file)
+except:
+    settings['dir'] = input("Wo sollen die Edge-Browser-Dateien gespeichert werden?\n")
+    with open(f'{parent_dir}\\rewardSettings.json', 'w') as file:
+        json.dump(settings, file)
 
 def timer(func):
     def wrapper(*args, **kwargs):
@@ -32,7 +44,7 @@ class Browser:
         self.in_mobile_view = False
 
         self.options = Options()
-        self.options.add_argument(f"--user-data-dir={dir}")
+        self.options.add_argument(f"--user-data-dir={settings['dir']}")
 
         self.driver = webdriver.Edge(options=self.options)
 
@@ -92,6 +104,7 @@ class Browser:
         self.switch_to_tab(0)
 
     def click_element(self, element, clickType=0):
+        print("click_element")
         if(isinstance(element, Selector)):
             element = self.find_element(element)
         # isinstance(element, webdriver.remote.webelement.WebElement)
@@ -136,7 +149,7 @@ class Actions:
         cards = browser.find_elements(
             Selector(By.CSS_SELECTOR, ".mee-icon-AddMedium"))
         for card in cards:
-            browser.click_element(card)
+            browser.click_element(card, 1)
         
         if(len(cards) > 0):
             browser.close_tab(0)
